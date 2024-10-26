@@ -19,18 +19,27 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
+    let name = args.name;
 
-    let name = args.name.clone();
     // runtime string executed through sh shell
-    let out = sh_dangerous(format!("echo mya name is {name}")).read().unwrap();
+    let out = sh_dangerous(format!("echo 1 my name is {name}")).read().unwrap();
     println!("{}", out);
+    // runtime string executed through sh shell, to stdout
+    let out = sh_dangerous(format!("echo 2 my name is {name}")).run().unwrap();
 
     // static string executed through sh shell
-    let out = sh("echo this is static str").read().unwrap();
+    let out = sh("echo 3 this is static str").read().unwrap();
     println!("{}", out);
 
-    let name = args.name.clone();
     // single command executed directly
-    let out = cmd!("echo", format!("my name is {name}")).read().unwrap();
+    let out = cmd!("echo", format!("4 my name is {name}")).read().unwrap();
     println!("{}", out);
+
+    // Native single command
+    let _child = std::process::Command::new("echo")
+        .args(["5 Native"])
+        .stdout(std::process::Stdio::inherit())
+        .spawn()
+        .unwrap();
+        // .wait().await;
 }
